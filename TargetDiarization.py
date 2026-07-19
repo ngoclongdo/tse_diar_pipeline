@@ -788,7 +788,10 @@ class TargetDiarization:
         for spk in spk_list:
             combined_spk_audio = self.combine_audio_chunks(asr_result=asr_result, speaker=spk)
             if combined_spk_audio is not None:
-                combined_spk_asr = self.tasr.asrp.asr_detection(wav_file=combined_spk_audio, asr_engine=self.asr_engine)[0]
+                combined_spk_asr_list = self.tasr.asrp.asr_detection(wav_file=combined_spk_audio, asr_engine=self.asr_engine)
+                if not combined_spk_asr_list:
+                    continue
+                combined_spk_asr = combined_spk_asr_list[0]
                 if "timestamp" not in combined_spk_asr.keys() or not combined_spk_asr['timestamp']:
                     text = combined_spk_asr['text'].strip()
                     if not more_args['no_punc']:
