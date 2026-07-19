@@ -90,7 +90,9 @@ def run_tier_evaluation(dataset, tier, num_samples):
                 print_results(results)
                 
         except Exception as e:
+            import traceback
             print(f"[LỖI] Xử lý thất bại: {e}")
+            traceback.print_exc()
 
 def main():
     parser = argparse.ArgumentParser(description="TargetDiarization Cascading Evaluator")
