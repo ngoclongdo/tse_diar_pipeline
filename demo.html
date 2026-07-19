@@ -1,0 +1,1352 @@
+<!-- Written by Claude 4.0 -->
+<!-- Date: 2025-8-19 -->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Target Diarization Demo</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .hero-section {
+            text-align: center;
+            /* padding: 60px 0; */
+            margin-bottom: 40px;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 300;
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .container {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 32px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+        
+        .section-icon {
+            font-size: 2rem;
+            margin-right: 16px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin: 0;
+        }
+        
+        .section-description {
+            color: #718096;
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        input[type="file"],
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(240, 147, 251, 0.6);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        button:disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .status-card {
+            padding: 20px;
+            border-radius: 16px;
+            margin: 20px 0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: none;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status {
+            padding: 16px;
+            border-radius: 16px;
+            margin: 10px 0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: none;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status.success {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1) 0%, rgba(56, 178, 172, 0.1) 100%);
+            color: #2f855a;
+            border: 1px solid rgba(72, 187, 120, 0.2);
+        }
+        
+        .status.error {
+            background: linear-gradient(135deg, rgba(245, 101, 101, 0.1) 0%, rgba(229, 62, 62, 0.1) 100%);
+            color: #c53030;
+            border: 1px solid rgba(245, 101, 101, 0.2);
+        }
+        
+        .status.info {
+            background: linear-gradient(135deg, rgba(66, 153, 225, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%);
+            color: #3182ce;
+            border: 1px solid rgba(66, 153, 225, 0.2);
+        }
+        
+        .status.warning {
+            background: linear-gradient(135deg, rgba(236, 201, 75, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+            color: #d69e2e;
+            border: 1px solid rgba(236, 201, 75, 0.2);
+        }
+        
+        .result-container {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 24px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .result-item {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        
+        .result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .speaker-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-right: 12px;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .speaker-target {
+            background: linear-gradient(135deg, #48bb78 0%, #38b2ac 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);
+        }
+        
+        .speaker-other {
+            background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(113, 128, 150, 0.3);
+        }
+        
+        .speaker-uncertain {
+            background: linear-gradient(135deg, #ecc94b 0%, #f6ad55 100%);
+            color: #744210;
+            box-shadow: 0 4px 12px rgba(236, 201, 75, 0.3);
+        }
+        
+        .timerange {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .text-content {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        .statistics {
+            background: #e9f7ef;
+            border: 1px solid #27ae60;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-item {
+            display: inline-block;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        
+        .ws-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .audio-controls {
+            /* margin: 20px 0; */
+            /* padding: 15px; */
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-x: auto;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+        
+        .api-info {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 16px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Toast 样式 - 类似 Gradio 右上角提示 */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            pointer-events: none;
+            max-width: 400px;
+        }
+        
+        .toast {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .toast::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 2px 0 0 2px;
+        }
+        
+        .toast.toast-success::before {
+            background: linear-gradient(135deg, #48bb78 0%, #38b2ac 100%);
+        }
+        
+        .toast.toast-error::before {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        }
+        
+        .toast.toast-info::before {
+            background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+        }
+        
+        .toast.toast-warning::before {
+            background: linear-gradient(135deg, #ecc94b 0%, #f6ad55 100%);
+        }
+        
+        .toast-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .toast-success .toast-icon {
+            color: #48bb78;
+        }
+        
+        .toast-error .toast-icon {
+            color: #f56565;
+        }
+        
+        .toast-info .toast-icon {
+            color: #4299e1;
+        }
+        
+        .toast-warning .toast-icon {
+            color: #ecc94b;
+        }
+        
+        .toast-content {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #2d3748;
+            font-weight: 500;
+        }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 16px;
+            color: #a0aec0;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        
+        .toast-close:hover {
+            background: rgba(160, 174, 192, 0.1);
+            color: #718096;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .row {
+                flex-direction: column;
+            }
+            
+            .container {
+                margin: 0 16px;
+                padding: 24px;
+            }
+            
+            .toast-container {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+            
+            .toast {
+                transform: translateY(-100px);
+            }
+            
+            .toast.show {
+                transform: translateY(0);
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .col {
+            flex: 1;
+            min-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1 class="hero-title">Target Diarization Demo</h1>
+            <p class="hero-subtitle">带目标识别的说话人日志系统</p>
+        </div>
+        
+        <!-- API Status -->
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">🔗</div>
+                <div>
+                    <div class="section-title">服务状态</div>
+                    <div class="section-description">实时监控AI处理服务运行状态</div>
+                </div>
+            </div>
+            <div class="api-info">
+                <div class="form-group">
+                    <label for="server-url-input">服务地址:</label>
+                    <input type="url" id="server-url-input" value="http://localhost:8000" class="form-input" placeholder="http://localhost:8000">
+                </div>
+                <p><strong>运行状态:</strong> <span id="api-status">检查中...</span></p>
+                <button onclick="checkApiHealth()" class="btn">刷新状态</button>
+            </div>
+        </div>
+
+        <!-- HTTP API 测试 -->
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">🎵</div>
+                <div>
+                    <div class="section-title">非实时音频处理</div>
+                    <div class="section-description">上传完整音频文件，生成说话人日志结果</div>
+                </div>
+            </div>
+            <div class="section">
+            <form id="http-form">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="audio-file">待检测音频文件</label>
+                            <input type="file" id="audio-file" accept=".wav,.mp3,.flac,.m4a,.ogg" required class="form-input">
+                            <small style="color: #718096; margin-top: 8px; display: block;">支持 WAV, MP3, FLAC, M4A, OGG 格式</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="target-file">目标说话人音频 (可选)</label>
+                            <input type="file" id="target-file" accept=".wav,.mp3,.flac,.m4a,.ogg" class="form-input">
+                            <small style="color: #718096; margin-top: 8px; display: block;">提供目标说话人样本以锚定其在待检测音频中出现的位置</small>
+                        </div>
+                    </div>
+                    
+                    <div class="col">
+                    </div>
+                </div>
+                
+                <button type="submit" id="http-submit" class="btn">
+                    <span id="http-loading" class="loading hidden"></span>
+                    开始处理
+                </button>
+            </form>
+            
+            <div id="http-status"></div>
+            <div id="http-results" class="result-container hidden"></div>
+        </div>
+    </div>
+
+        <!-- WebSocket API 测试 -->
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">🎤</div>
+                <div>
+                    <div class="section-title">实时语音处理</div>
+                    <div class="section-description">实时录音并进行说话人分离，即时查看处理结果</div>
+                </div>
+            </div>
+            <div class="section">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <label for="ws-target-file">目标说话人音频 (可选)</label>
+                        <input type="file" id="ws-target-file" accept=".wav,.mp3,.flac,.m4a,.ogg" class="form-input">
+                        <small style="color: #718096; margin-top: 8px; display: block;">提供目标说话人样本以锚定其在待检测音频中出现的位置</small>
+                    </div>
+                    
+
+                </div>
+                
+                <div class="col">
+                    <div id="recording-controls-panel" class="form-group hidden">
+                        <label>录音控制</label>
+                        <div class="audio-controls">
+                            <div id="recording-status" class="status info">准备录音...</div>
+                            <div id="recording-level">
+                                <label>音量: </label>
+                                <div style="display: inline-block; width: 200px; height: 10px; background: #ddd; border-radius: 5px; overflow: hidden;">
+                                    <div id="volume-bar" style="height: 100%; background: #4CAF50; width: 0%; transition: width 0.1s;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ws-controls">
+                <button onclick="startRecordingInference()" id="ws-start-recording" class="btn">开始处理</button>
+                <button onclick="stopRecordingInference()" id="ws-stop-recording" class="btn btn-secondary" disabled>停止处理</button>
+            </div>
+            
+            <div id="ws-status"></div>
+            <div id="ws-results" class="result-container hidden"></div>
+        </div>
+    </div>
+
+        <!-- 原始响应查看 -->
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">🔍</div>
+                <div>
+                    <div class="section-title">技术详情</div>
+                    <div class="section-description">查看API返回的原始数据</div>
+                </div>
+            </div>
+            <div class="section">
+                <button onclick="toggleRawData()" class="btn">切换数据显示</button>
+                <pre id="raw-data" class="hidden"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 容器 -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        // 全局变量
+        let websocket = null;
+        let isStreaming = false;
+        let audioContext = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let microphone = null;
+        let processor = null;
+        let isRecording = false;
+        let recordingStartTime = null;
+        let volumeAnalyzer = null;
+        let toastCount = 0;
+        
+        // 获取动态服务器地址
+        function getServerUrl() {
+            const input = document.getElementById('server-url-input');
+            let url = input.value.trim();
+            
+            // 验证URL格式
+            if (!url) {
+                url = 'http://localhost:8000';
+                input.value = url;
+            }
+            
+            // 确保以http://或https://开头
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'http://' + url;
+                input.value = url;
+            }
+            
+            // 移除末尾的斜杠
+            if (url.endsWith('/')) {
+                url = url.slice(0, -1);
+                input.value = url;
+            }
+            
+            return url;
+        }
+        
+        function getWebSocketUrl() {
+            const serverUrl = getServerUrl();
+            return serverUrl.replace(/^http/, 'ws');
+        }
+        
+        // 页面加载时检查API状态
+        window.onload = function() {
+            checkApiHealth();
+            
+            // 监听服务地址输入变化
+            const serverUrlInput = document.getElementById('server-url-input');
+            serverUrlInput.addEventListener('blur', function() {
+                // 当用户输入完成时自动验证URL格式
+                getServerUrl();
+            });
+            
+            serverUrlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    // 按Enter键时检查服务健康状态
+                    checkApiHealth();
+                }
+            });
+        };
+        
+        // 检查API健康状态
+        async function checkApiHealth() {
+            const statusElement = document.getElementById('api-status');
+            const serverUrl = getServerUrl();
+            
+            try {
+                statusElement.innerHTML = '<span style="color: #4299e1; font-weight: 600;">检查中...</span>';
+                
+                const response = await fetch(`${serverUrl}/health`, {
+                    timeout: 5000
+                });
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    statusElement.innerHTML = '<span style="color: #48bb78; font-weight: 600;">✅ AI服务运行正常</span>';
+                    showToast('服务连接成功', 'success', 2000);
+                } else {
+                    statusElement.innerHTML = '<span style="color: #f6ad55; font-weight: 600;">⚠️ 服务状态异常</span>';
+                    showToast('服务状态异常', 'warning', 3000);
+                }
+            } catch (error) {
+                statusElement.innerHTML = '<span style="color: #f56565; font-weight: 600;">❌ 无法连接服务</span>';
+                showToast(`无法连接到 ${serverUrl}`, 'error', 4000);
+                console.error('Health check failed:', error);
+            }
+        }
+        
+        // HTTP API 测试
+        document.getElementById('http-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('http-submit');
+            const loadingIcon = document.getElementById('http-loading');
+            const statusDiv = document.getElementById('http-status');
+            const resultsDiv = document.getElementById('http-results');
+            
+            // 显示加载状态
+            submitBtn.disabled = true;
+            loadingIcon.classList.remove('hidden');
+            statusDiv.innerHTML = '<div class="status info">AI正在分析音频内容...</div>';
+            resultsDiv.classList.add('hidden');
+            
+            try {
+                const formData = new FormData();
+                
+                // 添加文件
+                const audioFile = document.getElementById('audio-file').files[0];
+                const targetFile = document.getElementById('target-file').files[0];
+                
+                if (!audioFile) {
+                    throw new Error('⚠️ 请先选择要处理的音频文件');
+                }
+                
+                formData.append('audio_file', audioFile);
+                if (targetFile) {
+                    formData.append('target_file', targetFile);
+                }
+                
+                // 添加参数 (强制启用目标音频输出)
+                formData.append('is_single', false);
+                formData.append('output_target_audio', true);
+                
+                const startTime = Date.now();
+                const serverUrl = getServerUrl();
+                const response = await fetch(`${serverUrl}/diarization/infer`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                const endTime = Date.now();
+                
+                // 显示原始数据
+                document.getElementById('raw-data').textContent = JSON.stringify(result, null, 2);
+                
+                if (result.success) {
+                    statusDiv.innerHTML = `<div class="status success">
+                        AI处理完成！用时: ${((endTime - startTime) / 1000).toFixed(2)}秒
+                    </div>`;
+                    
+                    displayHttpResults(result.data);
+                } else {
+                    statusDiv.innerHTML = `<div class="status error">
+                        处理失败: ${result.error}
+                    </div>`;
+                }
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">
+                    请求失败: ${error.message}
+                </div>`;
+                console.error('HTTP request failed:', error);
+            } finally {
+                submitBtn.disabled = false;
+                loadingIcon.classList.add('hidden');
+            }
+        });
+        
+        // 显示HTTP结果
+        function displayHttpResults(data) {
+            const resultsDiv = document.getElementById('http-results');
+            
+            let html = `
+                <h3>推理结果</h3>
+                <div class="statistics">
+                    <div class="stat-item">目标说话人: ${data.target_speaker_id}</div>
+                    <div class="stat-item">总说话人数: ${data.total_speakers}</div>
+                    <div class="stat-item">总时长: ${data.statistics.total_duration}秒</div>
+                    <div class="stat-item">目标说话人时长: ${data.statistics.target_speaker_duration}秒</div>
+                </div>
+                
+                <h3>说话内容:</h3>
+            `;
+            
+            data.results.forEach((result, index) => {
+                const speakerClass = `speaker-${result.speaker_type}`;
+                html += `
+                    <div class="result-item">
+                        <div class="timerange">${result.timerange[0]}s - ${result.timerange[1]}s</div>
+                        <span class="speaker-tag ${speakerClass}">
+                            说话人 ${result.speaker} (${result.speaker_type})
+                        </span>
+                        <span style="font-size: 12px; color: #6c757d;">[${result.type}]</span>
+                        <div class="text-content">${result.text}</div>
+                    </div>
+                `;
+            });
+            
+            if (data.target_audio_base64) {
+                html += `
+                    <h3>目标说话人音频:</h3>
+                    <div class="result-item">
+                        <p>音频数据已提取 (Base64编码，长度: ${data.target_audio_base64.length} 字符)</p>
+                        <button onclick="playTargetAudio('${data.target_audio_base64}')">播放音频</button>
+                    </div>
+                `;
+            }
+            
+            resultsDiv.innerHTML = html;
+            resultsDiv.classList.remove('hidden');
+        }
+        
+
+        
+        // 处理WebSocket消息
+        function handleWebSocketMessage(message) {
+            const resultsDiv = document.getElementById('ws-results');
+            
+            console.log('WebSocket message:', message);
+            
+            switch (message.type) {
+                case 'config_ack':
+                    showToast('配置已确认，开始处理音频', 'success', 3000);
+                    break;
+                    
+                case 'segment_result':
+                    displayStreamResult(message.data);
+                    break;
+                    
+                case 'status':
+                    if (message.message === 'processing') {
+                        showToast('正在处理音频流...', 'info', 2000);
+                    } else if (message.message === 'completed') {
+                        showToast('流式推理完成', 'success', 4000);
+                    }
+                    break;
+                    
+                case 'error':
+                    showToast(`错误: ${message.message}`, 'error', 6000);
+                    break;
+            }
+            
+            // 更新原始数据显示
+            const rawData = document.getElementById('raw-data');
+            rawData.textContent += JSON.stringify(message, null, 2) + '\n\n';
+        }
+        
+        // 显示流式结果
+        function displayStreamResult(data) {
+            const resultsDiv = document.getElementById('ws-results');
+            const segment = data.segment;
+            const speakerClass = `speaker-${segment.speaker_type}`;
+            
+            const resultHtml = `
+                <div class="result-item">
+                    <div class="timerange">${segment.timerange[0]}s - ${segment.timerange[1]}s</div>
+                    <span class="speaker-tag ${speakerClass}">
+                        说话人 ${segment.speaker} (${segment.speaker_type})
+                    </span>
+                    <span style="font-size: 12px; color: #6c757d;">[${segment.type}]</span>
+                    <div class="text-content">${segment.text}</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 5px;">
+                        累计时间: ${data.cumulative_time}s | 
+                        接收时间: ${new Date(data.timestamp * 1000).toLocaleTimeString()}
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML += resultHtml;
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+
+        
+        // 录音组件初始化
+        async function initRecording() {
+            try {
+                // 请求麦克风权限
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        sampleRate: 16000,
+                        channelCount: 1,
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    }
+                });
+                
+                // 创建音频上下文
+                audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                    sampleRate: 16000
+                });
+                
+                // 创建音频节点
+                microphone = audioContext.createMediaStreamSource(stream);
+                processor = audioContext.createScriptProcessor(4096, 1, 1);
+                volumeAnalyzer = audioContext.createAnalyser();
+                volumeAnalyzer.fftSize = 256;
+                
+                // 连接音频节点
+                microphone.connect(volumeAnalyzer);
+                microphone.connect(processor);
+                processor.connect(audioContext.destination);
+                
+                // 音频处理回调
+                processor.onaudioprocess = function(event) {
+                    if (isRecording && websocket && websocket.readyState === WebSocket.OPEN) {
+                        const inputBuffer = event.inputBuffer.getChannelData(0);
+                        sendAudioChunk(inputBuffer);
+                    }
+                    
+                    // 更新音量显示
+                    updateVolumeLevel();
+                };
+                
+                return true;
+            } catch (error) {
+                console.error('录音初始化失败:', error);
+                throw error;
+            }
+        }
+        
+        // 更新音量显示
+        function updateVolumeLevel() {
+            if (!volumeAnalyzer) return;
+            
+            const dataArray = new Uint8Array(volumeAnalyzer.frequencyBinCount);
+            volumeAnalyzer.getByteFrequencyData(dataArray);
+            
+            // 计算平均音量
+            let sum = 0;
+            for (let i = 0; i < dataArray.length; i++) {
+                sum += dataArray[i];
+            }
+            const averageVolume = sum / dataArray.length;
+            
+            // 更新音量条
+            const volumeBar = document.getElementById('volume-bar');
+            if (volumeBar) {
+                const percentage = (averageVolume / 255) * 100;
+                volumeBar.style.width = percentage + '%';
+            }
+        }
+        
+        // 发送音频块
+        let audioBuffer = [];
+        const CHUNK_SIZE = 32000; // 2秒的音频数据（16kHz采样率）
+        
+        function sendAudioChunk(inputData) {
+            // 累积音频数据
+            audioBuffer.push(...inputData);
+            
+            // 当累积到2秒的数据时发送
+            if (audioBuffer.length >= CHUNK_SIZE) {
+                const chunk = audioBuffer.slice(0, CHUNK_SIZE);
+                audioBuffer = audioBuffer.slice(CHUNK_SIZE);
+                
+                // 转换为16位整数
+                const int16Array = new Int16Array(chunk.length);
+                for (let i = 0; i < chunk.length; i++) {
+                    int16Array[i] = Math.max(-32768, Math.min(32767, chunk[i] * 32767));
+                }
+                
+                // 编码为base64发送
+                const base64Data = btoa(String.fromCharCode(...new Uint8Array(int16Array.buffer)));
+                
+                if (websocket && websocket.readyState === WebSocket.OPEN) {
+                    websocket.send(JSON.stringify({
+                        type: "audio_chunk",
+                        data: base64Data
+                    }));
+                }
+            }
+        }
+        
+        // 工具函数
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // Toast 相关函数
+        function showToast(message, type = 'info', duration = 5000) {
+            const container = document.getElementById('toast-container');
+            const toastId = `toast-${++toastCount}`;
+            
+            // 选择图标
+            let icon = '🔵';
+            switch (type) {
+                case 'success':
+                    icon = '✅';
+                    break;
+                case 'error':
+                    icon = '❌';
+                    break;
+                case 'warning':
+                    icon = '⚠️';
+                    break;
+                case 'info':
+                default:
+                    icon = 'ℹ️';
+                    break;
+            }
+            
+            // 创建toast元素
+            const toast = document.createElement('div');
+            toast.id = toastId;
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">${icon}</div>
+                <div class="toast-content">${message}</div>
+                <button class="toast-close" onclick="hideToast('${toastId}')">&times;</button>
+            `;
+            
+            // 添加到容器
+            container.appendChild(toast);
+            
+            // 触发显示动画
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // 自动隐藏
+            if (duration > 0) {
+                setTimeout(() => {
+                    hideToast(toastId);
+                }, duration);
+            }
+            
+            return toastId;
+        }
+        
+        function hideToast(toastId) {
+            const toast = document.getElementById(toastId);
+            if (toast) {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 400);
+            }
+        }
+        
+        function clearAllToasts() {
+            const container = document.getElementById('toast-container');
+            const toasts = container.querySelectorAll('.toast');
+            toasts.forEach(toast => {
+                hideToast(toast.id);
+            });
+        }
+        
+        function toggleRawData() {
+            const rawData = document.getElementById('raw-data');
+            rawData.classList.toggle('hidden');
+        }
+        
+        function playTargetAudio(base64Data) {
+            try {
+                // 解码Base64音频数据
+                const binaryString = atob(base64Data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                // 创建音频上下文
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const int16Array = new Int16Array(bytes.buffer);
+                const float32Array = new Float32Array(int16Array.length);
+                
+                // 转换为浮点数
+                for (let i = 0; i < int16Array.length; i++) {
+                    float32Array[i] = int16Array[i] / 32767.0;
+                }
+                
+                // 创建音频缓冲区
+                const audioBuffer = audioContext.createBuffer(1, float32Array.length, 16000);
+                audioBuffer.getChannelData(0).set(float32Array);
+                
+                // 播放音频
+                const source = audioContext.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(audioContext.destination);
+                source.start();
+                
+                alert('开始播放目标说话人音频');
+                
+            } catch (error) {
+                console.error('Play audio failed:', error);
+                alert('播放音频失败: ' + error.message);
+            }
+        }
+
+        // 开始录音推理
+        async function startRecordingInference() {
+            const resultsDiv = document.getElementById('ws-results');
+            const recordingStatus = document.getElementById('recording-status');
+            const recordingControlsPanel = document.getElementById('recording-controls-panel');
+            
+            try {
+                // 清除之前的toast
+                clearAllToasts();
+                
+                // 1. 初始化录音组件
+                showToast('正在初始化录音组件...', 'info', 2000);
+                await initRecording();
+                
+                // 2. 连接WebSocket
+                showToast('正在连接 WebSocket...', 'info', 2000);
+                const wsUrl = getWebSocketUrl();
+                websocket = new WebSocket(`${wsUrl}/diarization/stream`);
+                
+                await new Promise((resolve, reject) => {
+                    websocket.onopen = resolve;
+                    websocket.onerror = reject;
+                    setTimeout(reject, 5000); // 5秒超时
+                });
+                
+                // 3. 发送配置
+                const config = {
+                    type: "config",
+                    data: {
+                        sampling_rate: 16000,
+                        is_single: false,
+                        output_target_audio: false,
+                        chunk_duration: 1.0,
+                        has_target_file: document.getElementById('ws-target-file').files.length > 0
+                    }
+                };
+                
+                websocket.send(JSON.stringify(config));
+                
+                // 4. 发送目标音频（如果有）
+                const targetFile = document.getElementById('ws-target-file').files[0];
+                if (targetFile) {
+                    showToast('正在上传目标音频...', 'info', 2000);
+                    const targetAudioBase64 = await fileToBase64(targetFile);
+                    websocket.send(JSON.stringify({
+                        type: "target_audio",
+                        data: targetAudioBase64
+                    }));
+                }
+                
+                // 5. 设置WebSocket消息处理
+                websocket.onmessage = function(event) {
+                    const message = JSON.parse(event.data);
+                    handleWebSocketMessage(message);
+                };
+                
+                websocket.onclose = function() {
+                    showToast('WebSocket 连接已关闭', 'warning', 4000);
+                    stopRecordingInference();
+                };
+                
+                websocket.onerror = function(error) {
+                    showToast('WebSocket 连接错误', 'error', 5000);
+                    console.error('WebSocket error:', error);
+                    stopRecordingInference();
+                };
+                
+                // 6. 开始录音
+                isRecording = true;
+                recordingStartTime = Date.now();
+                audioBuffer = []; // 重置音频缓冲区
+                
+                // 更新UI状态
+                document.getElementById('ws-start-recording').disabled = true;
+                document.getElementById('ws-stop-recording').disabled = false;
+                
+                // 显示录音控制面板和结果容器
+                recordingControlsPanel.classList.remove('hidden');
+                recordingStatus.innerHTML = '正在录音...';
+                
+                showToast('开始实时推理', 'success', 3000);
+                
+                // 显示结果容器（如果是第一次启动）
+                if (resultsDiv.classList.contains('hidden')) {
+                    resultsDiv.innerHTML = '<h3>实时推理结果:</h3>';
+                    resultsDiv.classList.remove('hidden');
+                }
+                
+            } catch (error) {
+                showToast(`启动失败: ${error.message}`, 'error', 6000);
+                console.error('Start recording inference failed:', error);
+                stopRecordingInference();
+            }
+        }
+        
+        // 停止录音推理
+        function stopRecordingInference() {
+            const recordingControlsPanel = document.getElementById('recording-controls-panel');
+            
+            try {
+                // 1. 停止录音
+                isRecording = false;
+                
+                // 2. 发送音频结束信号
+                if (websocket && websocket.readyState === WebSocket.OPEN) {
+                    websocket.send(JSON.stringify({
+                        type: "audio_end"
+                    }));
+                }
+                
+                // 3. 关闭WebSocket连接
+                if (websocket) {
+                    websocket.close();
+                    websocket = null;
+                }
+                
+                // 4. 清理音频资源
+                if (processor) {
+                    processor.disconnect();
+                    processor = null;
+                }
+                
+                if (microphone) {
+                    microphone.disconnect();
+                    microphone = null;
+                }
+                
+                if (audioContext) {
+                    audioContext.close();
+                    audioContext = null;
+                }
+                
+                // 5. 更新UI状态
+                document.getElementById('ws-start-recording').disabled = false;
+                document.getElementById('ws-stop-recording').disabled = true;
+                
+                // 隐藏录音控制面板
+                recordingControlsPanel.classList.add('hidden');
+                
+                showToast('已停止录音推理', 'info', 3000);
+                
+            } catch (error) {
+                console.error('Stop recording inference failed:', error);
+                showToast(`停止过程中出错: ${error.message}`, 'error', 5000);
+            }
+        }
+    </script>
+</body>
+</html>

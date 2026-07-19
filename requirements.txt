@@ -1,0 +1,43 @@
+### Basic ###
+# torch  # install manually
+# torchaudio  # install manually
+numpy<2
+python-dotenv
+
+
+### AudioProcessor ###
+pytorch_lightning
+onnxruntime-gpu
+pyloudnorm
+audioread
+librosa
+audiostretchy
+pydub
+audiofile
+soundfile
+noisereduce
+
+
+### ASRProcessor ###
+transformers
+openai-whisper
+funasr
+modelscope
+addict
+simplejson
+rotary_embedding_torch
+
+
+### TargetASR ###
+datasets==2.21.0
+pyannote.audio
+silero_vad
+hdbscan
+umap
+
+
+### Demo ###
+fastapi
+gradio
+requests
+asyncio
