@@ -51,12 +51,20 @@ def run_tier_evaluation(dataset, tier, num_samples):
     for i in range(min(num_samples, len(dataset))):
         sample = dataset[i]
         
-        # Xử lý đường dẫn file tuỳ theo format của mỗi Dataset
-        audio_path = sample.get("audio", {}).get("path") or sample.get("audio_path") or sample.get("file")
-        if not audio_path: 
+        audio_info = sample.get("audio", {})
+        if "array" in audio_info:
+            audio_data = audio_info["array"]
+            sr = audio_info.get("sampling_rate", 16000)
+            file_name = audio_info.get("path", f"sample_{i}.wav")
+        else:
+            audio_data = sample.get("audio_path") or sample.get("file")
+            sr = 16000
+            file_name = os.path.basename(audio_data) if audio_data else "unknown"
+
+        if audio_data is None: 
             continue
             
-        print(f"\n--- Đang xử lý mẫu {i+1}/{num_samples}: {os.path.basename(audio_path)} ---")
+        print(f"\n--- Đang xử lý mẫu {i+1}/{num_samples}: {file_name} ---")
         
         try:
             if tier == 0:
@@ -73,12 +81,12 @@ def run_tier_evaluation(dataset, tier, num_samples):
                 
             elif tier == 3:
                 print(">> [Tier 3 - VAD Eval]: FSMN VAD -> CAM++/Pyannote -> MossFormer2 -> ASR (TẮT Denoise).")
-                target_spk, results, target_audio = td_pipeline.infer(wav_file=audio_path, target_file=None)
+                target_spk, results, target_audio = td_pipeline.infer(wav_file=audio_data, sampling_rate=sr, target_file=None)
                 print_results(results)
                 
             elif tier == 4:
                 print(">> [Tier 4 - Full E2E]: UVR -> VAD -> Diarization -> Separation -> Apollo -> ASR.")
-                target_spk, results, target_audio = td_pipeline.infer(wav_file=audio_path, target_file=None)
+                target_spk, results, target_audio = td_pipeline.infer(wav_file=audio_data, sampling_rate=sr, target_file=None)
                 print_results(results)
                 
         except Exception as e:
