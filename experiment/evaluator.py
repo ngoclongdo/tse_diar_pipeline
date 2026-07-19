@@ -80,11 +80,18 @@ def run_tier_evaluation(dataset, tier, num_samples):
         if "segments" in sample:
             has_gt = True
             for seg in sample["segments"]:
-                # Tuỳ biến linh hoạt theo cấu trúc data của HuggingFace
                 start = seg.get("start", 0.0)
                 end = seg.get("end", 0.0)
                 spk = seg.get("speaker", "unknown")
                 reference[Segment(start, end)] = spk
+        elif "timestamps_start" in sample and "timestamps_end" in sample and "speaker" in sample:
+            # Format riêng của bộ ViYT-Diar
+            has_gt = True
+            starts = sample["timestamps_start"]
+            ends = sample["timestamps_end"]
+            speakers = sample["speaker"]
+            for s_start, s_end, spk in zip(starts, ends, speakers):
+                reference[Segment(s_start, s_end)] = spk
         
         try:
             if tier == 0:
